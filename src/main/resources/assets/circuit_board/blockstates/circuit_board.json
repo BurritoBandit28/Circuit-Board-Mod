@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "": {
+      "model": "circuit_board:block/circuit_board" }
+  }
+}

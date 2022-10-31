@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "circuit_board:block/green_io_block_input"
+  }
+}

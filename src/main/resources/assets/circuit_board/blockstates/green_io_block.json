@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "is_input=false": {
+      "model": "circuit_board:block/green_io_block_output" },
+    "is_input=true": {
+      "model": "circuit_board:block/green_io_block_input" }
+  }
+}
