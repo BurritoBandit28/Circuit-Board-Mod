@@ -28,47 +28,49 @@ public class IOBlockEntity extends BlockEntity {
     }
 
     public static int getRedstoneOutput(BlockPos boardPos, World world, BlockPos pos, BlockState state, CircuitBoardBlocks.colours colours) {
+        if (!world.isClient) {
+            Direction facing;
+            Direction opposite;
+            Direction left;
+            Direction right;
+            CircuitBoardBlock boardBlock;
 
-        Direction facing;
-        Direction opposite;
-        Direction left;
-        Direction right;
-        CircuitBoardBlock boardBlock;
-        try {
-            facing = world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING);
-            opposite = facing.getOpposite();
-            left = facing.rotateYCounterclockwise();
-            right = facing.rotateYClockwise();
-            boardBlock = (CircuitBoardBlock) world.getBlockState(boardPos).getBlock();
-        }
-        catch (Exception e){
-            //CircuitBoard.LOGGER.warn("Target block is not a circuit board");
-            System.out.println("FUCK");
-            System.out.println(boardPos + "board pos");
-            System.out.println(pos.toString());
-            return 0;
-        }
-
-        if (state.get(BooleanProperty.of("is_input"))){
             try {
-                switch (colours) {
-                    case green -> {
-                        //System.out.println(boardBlock.getStrongRedstonePower(state, world, boardPos, facing));
-                        return world.getEmittedRedstonePower(boardPos.offset(facing, 1),world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).getOpposite());}
-                    case red -> {
-                        //System.out.println(boardBlock.getStrongRedstonePower(state, world, boardPos, left));
-                        return world.getEmittedRedstonePower(boardPos.offset(world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).rotateCounterclockwise(world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).getAxis()), 1),world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).rotateCounterclockwise(world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).getAxis()).getOpposite());}
-                    default -> {return world.getReceivedRedstonePower(pos);}
-                }
+                facing = world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING);
+                opposite = facing.getOpposite();
+                left = facing.rotateYCounterclockwise();
+                right = facing.rotateYClockwise();
+                boardBlock = (CircuitBoardBlock) world.getBlockState(boardPos).getBlock();
+
             }
-            catch (Exception ignored) {
-                //CircuitBoard.LOGGER.error("No circuit board found for IO block @ "+ pos.toString());
+            catch (Exception e){
+                return 0;
+            }
+
+            if (state.get(BooleanProperty.of("is_input"))) {
+                try {
+                    switch (colours) {
+                        case green -> {
+                            System.out.println(boardBlock.getStrongRedstonePower(state, world, boardPos, facing));
+                            return world.getEmittedRedstonePower(boardPos.offset(facing, 1), world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).getOpposite());
+                        }
+                        case red -> {
+                            //System.out.println(boardBlock.getStrongRedstonePower(state, world, boardPos, left));
+                            return world.getEmittedRedstonePower(boardPos.offset(world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).rotateCounterclockwise(world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).getAxis()), 1), world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).rotateCounterclockwise(world.getBlockState(boardPos).get(Properties.HORIZONTAL_FACING).getAxis()).getOpposite());
+                        }
+                        default -> {
+                            return world.getReceivedRedstonePower(pos);
+                        }
+                    }
+                } catch (Exception ignored) {
+                    //CircuitBoard.LOGGER.error("No circuit board found for IO block @ "+ pos.toString());
+                    return 0;
+                }
+            } else {
                 return 0;
             }
         }
-        else {
-            return 0;
-        }
+        return 0;
     }
 
     //okay this naming was confusing me as well, this means getting the redstone out put for the circuit board, so the input for the IOBlock
@@ -97,6 +99,7 @@ public class IOBlockEntity extends BlockEntity {
         int[] nbtPos = nbt.getIntArray("board_pos");
         pos = new BlockPos(nbtPos[0], nbtPos[1], nbtPos[2]);
         setBoardPos(pos);
+        System.out.println(pos + "aaaaaaaaaaaaaaaaaaaaaaaaaawawawawawwawaaaaa");
         //System.out.printf("%s, %s, %s",nbtPos[0], nbtPos[1], nbtPos[2]);
         super.readNbt(nbt);
     }
